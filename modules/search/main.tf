@@ -12,7 +12,7 @@ variable "docker_hub_email" {
 
 variable "port" {
   type    = number
-  default = 3001
+  default = 3000
 }
 
 variable "database_url" {
@@ -44,10 +44,10 @@ resource "google_cloud_run_v2_service" "search" {
   template {
     containers {
       image = "docker.io/${local.docker_hub_username}/search:1.0.0"
-      /* ports {
+      ports {
         container_port = var.port
-      } 
-      startup_probe {
+      }
+      /*startup_probe {
         initial_delay_seconds = 0
         timeout_seconds = 1
         period_seconds = 3
@@ -60,14 +60,14 @@ resource "google_cloud_run_v2_service" "search" {
         http_get {
           path = "/"
         }
-      } */
+      }
       env {
         name  = "MONGO_DB_URI"
-        value = "mongodb://${var.database_url}/microservices"
-      }
+        value = "mongodb://${var.database_url}"
+      }*/
     }
   }
-  depends_on = [var.database_url]
+  depends_on = [null_resource.search_image, var.database_url]
 }
 
 locals {
@@ -87,8 +87,12 @@ data "google_iam_policy" "admin" {
 }
 
 resource "google_cloud_run_v2_service_iam_policy" "policy" {
-  project = google_cloud_run_v2_service.search.project
-  location = google_cloud_run_v2_service.search.location
-  name = google_cloud_run_v2_service.search.name
+  project     = google_cloud_run_v2_service.search.project
+  location    = google_cloud_run_v2_service.search.location
+  name        = google_cloud_run_v2_service.search.name
   policy_data = data.google_iam_policy.admin.policy_data
+} 
+
+output "url" {
+  value = google_cloud_run_v2_service.search.uri
 }

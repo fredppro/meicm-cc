@@ -19,10 +19,6 @@ variable "database_url" {
   type = string
 }
 
-/* module "database" {
-  source = "../database"
-} */
-
 resource "null_resource" "books_image" {
   provisioner "local-exec" {
     command = "docker buildx build --platform linux/amd64 -t ${local.docker_hub_username}/books:1.0.0 ./books"
@@ -44,7 +40,7 @@ resource "google_cloud_run_v2_service" "books" {
   template {
     containers {
       image = "docker.io/${local.docker_hub_username}/books:1.0.0"
-       ports {
+      ports {
         container_port = var.port
       }
       /* startup_probe {
@@ -60,13 +56,14 @@ resource "google_cloud_run_v2_service" "books" {
         http_get {
           path = "/"
         }
-      } */
+      } 
       env {
         name  = "MONGO_DB_URI"
         value = "mongodb://${var.database_url}"
-      }
+      }*/
     }
   }
+  depends_on = [null_resource.books_image, var.database_url]
 }
 
 locals {
@@ -80,14 +77,18 @@ data "google_iam_policy" "admin" {
   binding {
     role = "roles/editor"
     members = [
-      "allUsers",
+      "allUsers"
     ]
   }
 }
 
 resource "google_cloud_run_v2_service_iam_policy" "policy" {
-  project = google_cloud_run_v2_service.books.project
-  location = google_cloud_run_v2_service.books.location
-  name = google_cloud_run_v2_service.books.name
+  project     = google_cloud_run_v2_service.books.project
+  location    = google_cloud_run_v2_service.books.location
+  name        = google_cloud_run_v2_service.books.name
   policy_data = data.google_iam_policy.admin.policy_data
+}
+
+output "url" {
+  value = google_cloud_run_v2_service.books.uri
 }

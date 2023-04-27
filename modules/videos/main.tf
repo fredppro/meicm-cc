@@ -12,11 +12,11 @@ variable "docker_hub_email" {
 
 variable "port" {
   type    = number
-  default = 3003
+  default = 3000
 }
 
 variable "database_url" {
-  type = string
+  type    = string
   default = "https://mongodb-x7msqww2zq-uc.a.run.app"
 }
 
@@ -46,10 +46,10 @@ resource "google_cloud_run_v2_service" "videos" {
   template {
     containers {
       image = "docker.io/${local.docker_hub_username}/videos:1.0.0"
-      /*ports {
+      ports {
         container_port = var.port
       }
-      startup_probe {
+      /* startup_probe {
         initial_delay_seconds = 0
         timeout_seconds = 1
         period_seconds = 3
@@ -62,13 +62,14 @@ resource "google_cloud_run_v2_service" "videos" {
         http_get {
           path = "/"
         }
-      }*/
+      }
       env {
         name  = "MONGO_DB_URI"
-        value = "mongodb://https://mongodb-x7msqww2zq-uc.a.run.app"
-      }
+        value = "mongodb://${var.database_url}"
+      }*/
     }
   }
+  depends_on = [null_resource.videos_image, var.database_url]
 }
 
 
@@ -89,8 +90,12 @@ data "google_iam_policy" "admin" {
 }
 
 resource "google_cloud_run_v2_service_iam_policy" "policy" {
-  project = google_cloud_run_v2_service.videos.project
-  location = google_cloud_run_v2_service.videos.location
-  name = google_cloud_run_v2_service.videos.name
+  project     = google_cloud_run_v2_service.videos.project
+  location    = google_cloud_run_v2_service.videos.location
+  name        = google_cloud_run_v2_service.videos.name
   policy_data = data.google_iam_policy.admin.policy_data
+} 
+
+output "url" {
+  value = google_cloud_run_v2_service.videos.uri
 }

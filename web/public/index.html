@@ -36,7 +36,33 @@
   </form>
   <ul id="matches"></ul>
   <script>
+    
     const API = (() => {
+      /* var VIDEOS_URL;
+       var BOOKS_URL;
+       var SEARCH_URL;
+ 
+       const fetchEnvVars = () => {
+         try {
+           const response = fetch('/env-vars')
+             .then(response => response.json())
+             .then(results => {
+               VIDEOS_URL = envVars.VIDEOS_URL;
+               BOOKS_URL = envVars.BOOKS_URL;
+               SEARCH_URL = envVars.SEARCH_URL;
+               console.log("ENV VAR: ", envVars.VIDEOS_URL);
+               console.log("Assgined: ", VIDEOS_URL);
+             });
+ 
+         } catch (error) {
+           console.error('Error fetching environment variables:', error);
+         }
+         return false;
+       } */
+
+      // fetchEnvVars();
+      
+
       const makeSaveFunc = (selector, postNameFunc) => () => {
         try {
           const val = document.querySelector(selector).value;
@@ -59,19 +85,19 @@
         });
       };
 
-      const postVideoName = makePostNameFunc("http://localhost:8080/api/v1/videos");
-      const postBookName = makePostNameFunc("http://localhost:8080/api/v1/books");
+      const postVideoName = makePostNameFunc(`${booksUrl}/api/v1/videos`);
+      const postBookName = makePostNameFunc(`${booksUrl}/api/v1/books`);
       const searchInput = document.querySelector('#search');
 
       const clear = () => {
         try {
-          fetch("http://localhost:8080/api/v1/videos", {
+          fetch(`${VIDEOS_URL}/api/v1/videos`, {
             method: 'delete', headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/json'
             }
           })
-          fetch("http://localhost:8080/api/v1/books", {
+          fetch(`${BOOKS_URL}/api/v1/books`, {
             method: 'delete', headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/json'
@@ -92,7 +118,7 @@
         const query = searchInput.value;
         console.log(query)
         try {
-          fetch(`http://localhost:8080/api/v1/search?q=${query}`)
+          fetch(`${SEARCH_URL}/api/v1/search?q=${query}`)
             .then(resp => resp.json())
             .then(results => {
               console.log(results)
