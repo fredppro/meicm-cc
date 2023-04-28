@@ -28,4 +28,8 @@ Which i wasnt able to finish in time.
 So, the services are uploaded to the GCP Cloud but they can communicate with each other.
 
 
-Frontend url for remote web app should be:
+Frontend url for remote web app should be: https://web-x7msqww2zq-uc.a.run.app
+
+Search microservice: https://search-x7msqww2zq-uc.a.run.app
+Books microservice: https://books-x7msqww2zq-uc.a.run.app
+Videos microservice: https://videos-x7msqww2zq-uc.a.run.app
