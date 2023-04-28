@@ -2,8 +2,6 @@ const express = require("express");
 const Video = require("./models/video_model");
 const app = express();
 const bodyParser = require("body-parser");
-var cors = require('cors');
-app.use(cors());
 
 app.use(bodyParser.json());
 
